@@ -25,15 +25,15 @@ $tag = $version.node.InnerXML
 #Building docker image
 
 echo "Building k8s operator docker image with tag: $tag"
-echo "Publishing to Docker Hub : $PublishToDockerHub"
-
-exec { & docker build . -f .\src\HealthChecks.UI.K8s.Operator\Dockerfile -t xabarilcoding/healthchecksui-k8s-operator:$tag }
-exec { & docker tag xabarilcoding/healthchecksui-k8s-operator:$tag xabarilcoding/healthchecksui-k8s-operator:latest }
-
-echo "Created docker image healthchecksui-k8s-operator:$tag. You can execute this image using docker run"
-
 #Publish it
+
 if ($PublishToDockerHub) {
-    docker push xabarilcoding/healthchecksui-k8s-operator:$tag
-    docker push xabarilcoding/healthchecksui-k8s-operator:latest
+
+  echo ".. and publishing to Docker Hub"
+  exec { & docker buildx build . --platform=linux/arm64  --platform=linux/amd64 --push -f .\src\HealthChecks.UI.K8s.Operator\Dockerfile -t xabarilcoding/healthchecksui-k8s-operator:$tag -t xabarilcoding/healthchecksui-k8s-operator:latest }
+  echo "Published to Docker Hub"
+}
+else {
+  exec { & docker buildx build . --load -f .\src\HealthChecks.UI.K8s.Operator\Dockerfile -t xabarilcoding/healthchecksui-k8s-operator:$tag -t xabarilcoding/healthchecksui-k8s-operator:latest }
+  echo "Created docker image healthchecksui-k8s-operator:$tag. You can execute this image using docker run"
 }
