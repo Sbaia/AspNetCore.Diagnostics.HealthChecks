@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using HealthChecks.UI.K8s.Operator.Crd;
+using k8s.Models;
 
 namespace HealthChecks.UI.K8s.Operator;
 
@@ -23,4 +25,5 @@ public class HealthCheckResourceSpec
     public List<NameValueObject> DeploymentAnnotations { get; set; } = new List<NameValueObject>();
     public List<WebHookObject> Webhooks { get; set; } = new List<WebHookObject>();
     public List<TolerationObject> Tolerations { get; set; } = new List<TolerationObject>();
+    public List<V1LocalObjectReference> ImagePullSecrets { get; set; } = new List<V1LocalObjectReference>();
 }

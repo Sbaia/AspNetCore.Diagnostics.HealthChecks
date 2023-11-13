@@ -103,33 +103,38 @@ internal class DeploymentHandler
 
         var spec = new V1DeploymentSpec
         {
-            Selector = new V1LabelSelector
-            {
-                MatchLabels = new Dictionary<string, string>
+            Selector =
+                new V1LabelSelector
                 {
-                    ["app"] = resource.Spec.Name
-                }
-            },
+                    MatchLabels = new Dictionary<string, string> { ["app"] = resource.Spec.Name }
+                },
             Replicas = 1,
             Template = new V1PodTemplateSpec
             {
-                Metadata = new V1ObjectMeta
-                {
-                    Labels = new Dictionary<string, string>
+                Metadata =
+                    new V1ObjectMeta
                     {
-                        ["app"] = resource.Spec.Name
+                        Labels = new Dictionary<string, string> { ["app"] = resource.Spec.Name },
                     },
-                },
                 Spec = new V1PodSpec
                 {
-                    Containers = new List<V1Container>
-                    {
-                       uiContainer
-                    },
-                    Tolerations = tolerations
+                    Containers = new List<V1Container> { uiContainer },
+                    Tolerations = tolerations,
                 }
-            }
+            },
         };
+
+        if (resource.Spec.ImagePullSecrets.Any())
+        {
+            var secrets = new List<V1LocalObjectReference>();
+            foreach (var imagePullSecret in resource.Spec.ImagePullSecrets)
+            {
+                _logger.LogInformation("Adding ImagePullSecret to ui deployment with value {ImagePullSecretName}", imagePullSecret.Name);
+                secrets.Add(new V1LocalObjectReference(imagePullSecret.Name));
+            }
+
+            spec.Template.Spec.ImagePullSecrets = secrets;
+        }
 
         foreach (var annotation in resource.Spec.DeploymentAnnotations)
         {

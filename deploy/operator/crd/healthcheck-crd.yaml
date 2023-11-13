@@ -62,6 +62,13 @@ spec:
                   type: string
                 imagePullPolicy:
                   type: string
+                imagePullSecrets:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
                 stylesheetContent:
                   type: string
                 serviceAnnotations:
